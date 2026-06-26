@@ -144,7 +144,13 @@ def _connected_weights(
 
     placed_to_pos = {block: pos for pos, block in enumerate(placed_blocks)}
 
-    if b2b_conn.dim() == 2 and b2b_conn.shape[0] > current and b2b_conn.shape[1] > max(placed_blocks):
+    max_block = max([current] + placed_blocks)
+    is_adjacency_matrix = (
+        b2b_conn.dim() == 2
+        and b2b_conn.shape[0] == b2b_conn.shape[1]
+        and b2b_conn.shape[0] > max_block
+    )
+    if is_adjacency_matrix:
         idx = torch.tensor(placed_blocks, dtype=torch.long, device=b2b_conn.device)
         matrix_weights = b2b_conn[current, idx].float() + b2b_conn[idx, current].float()
         return matrix_weights.to(device=device, dtype=dtype).clamp_min(0.0)
